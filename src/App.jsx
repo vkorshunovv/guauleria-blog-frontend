@@ -3,7 +3,7 @@ import axios from "axios";
 import "./App.css";
 
 function App() {
-  const [post, setPosts] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState({ title: "", content: "" });
 
   useEffect(() => {
@@ -12,9 +12,10 @@ function App() {
 
   const fetchPosts = () => {
     axios
-      .get("http://localhost:5000/api/posts")
+      .get("http://localhost:5005/api/posts")
       .then((response) => {
         setPosts(response.data);
+        console.log("Fetching posts success");
       })
       .catch((error) => {
         console.log("Error fetching data:", error);
@@ -32,7 +33,7 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:5000/api/posts", newPost)
+      .post("http://localhost:5005/api/posts", newPost)
       .then((response) => {
         console.log("Post added:", response.data);
         setNewPost({ title: "", content: "" });
@@ -40,6 +41,19 @@ function App() {
       })
       .catch((error) => {
         console.log("Error adding post:", error);
+      });
+  };
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+    axios
+      .delete("http://localhost:5005/api/posts")
+      .then((response) => {
+        console.log("Post deleted: ", response.data);
+        fetchPosts();
+      })
+      .catch((error) => {
+        console.log("Error deleting post", error);
       });
   };
 
@@ -69,13 +83,17 @@ function App() {
         <button type="submit">Add Post</button>
       </form>
       <ul>
-        {posts.map((post) => {
+        {posts.map((post) => (
           <li key={post.id}>
             <h3>{post.title}</h3>
             <p>{post.content}</p>
-          </li>;
-        })}
+          </li>
+        ))}
       </ul>
+      <br />
+      <button type="button" onClick={handleDelete}>
+        Delete Post
+      </button>
     </div>
   );
 }
